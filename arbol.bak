@@ -1,22 +1,8 @@
 #lang racket
 (require pict
          pict/tree-layout)
-; ------------------------------------------------------
-; Instituto Tecnologico de Costa Rica
-; ------------------------------------------------------
-;                                    Pablo Muñoz Hidalgo
-;                                 Jonathan Quesada Salas
-; ------------------------------------------------------
+#| DEFINICION DE STRUCTS|#
 
-; ---------------------- PROYECTO ----------------------
-
-; ------------------------------------------------------
-;                                                  ARBOL
-; ------------------------------------------------------
-;                                ESTRUCTURAS PRINCIPALES
-; ------------------------------------------------------
-;                   Estructura que va a tener cada arbol
-; ------------------------------------------------------
 #|
 define la estructura del arbol, nada mas tiene el node root,
 el cual es un node comun y corriente por el cual se empieza todo.
@@ -24,46 +10,31 @@ el cual es un node comun y corriente por el cual se empieza todo.
 (define-struct struct_tree(root))
 
 
-; ------------------------------------------------------
-;                    Estructura que va a tener cada nodo
-; ------------------------------------------------------
 #|define la estructura del node, el cual tiene
 un id, un name, value y una lista de childs.|#
 (define-struct struct_node (id name value childs))
 
 
-; ------------------------------------------------------
-;                    Estructura que va a tener cada nodo
-; ------------------------------------------------------
-#|Funciones para facilitar la creacion de los nodos.|#
+#| FUNCIONES |#
+
+#| Funcion que crea un node, recibe el id, name y el value|#
 (define (create-node id name value )
   (make-struct_node id name value (list)))
 
 (define (create-node-with-childs id name value childs)
   (make-struct_node id name value (list)))
 
-; ------------------------------------------------------
-;                                     CREACION DEL ARBOL
-; ------------------------------------------------------
-#|Funciones para facilitar la creacion del arbol.|#
+#| Funcion que crea el arbol, recibe un node el cual pasara a ser la raiz del arbol.|#
 (define (create-tree node)
   (make-struct_tree node))
 
-
-#| Agregar un hijo al node padre y retorna el nodo padre con el nuevo nodo ingresado en sus hijos.|#
+#| agregar un hijo al node padre y retorna el nodo padre con el nuevo nodo ingresado en sus hijos.|#
 (define (add-child father new-child)
  (define father-aux (struct-copy struct_node father [childs (append (struct_node-childs father) (list new-child))]))
  (set! father father-aux)
   father)
 
-; ------------------------------------------------------
-;                                         ENCONTRAR NODO
-; ------------------------------------------------------
-; Entradas: Arbol
-;           Nodo a buscar
-;
-; Salida:   Nodo encontrado
-; ------------------------------------------------------
+
 #| Recibe el arbol en el cual haremos la busqueda, y recibe el id del nodo que queremos buscar
 devuelve falso sino encontro el nodo, o sino devuelve los datos del nodo|#
 (define (find-node tree id)
@@ -99,18 +70,6 @@ sino sigue recorriendo la lista, si al final se acaba la lista sin encontrar el 
                [(list? result) result]
                [else (check-node-childs (list-tail node-list 1) id)])]))
 
-
-; ------------------------------------------------------
-;                                 INSERTAR UN NUEVO NODO
-; ------------------------------------------------------
-; Entradas: Arbol
-;           Nodo padre
-;           ID
-;           Nombre
-;           Valor
-;
-; Salida:   El arbol con el nuevo nodo
-; ------------------------------------------------------
 
 #|Recibe el arbol, el id del padre del nodo que vamos a insertar, y el id, nombre y valor del nuevo nodo
 esta funcion crea un nuevo arbol con el nodo insertado
@@ -158,15 +117,7 @@ primero llama a una funcion auxiliar, esta va a ayudar a insertar el nodo y devu
           (set! act-node node-aux)
            act-node]))
 
-
-; ------------------------------------------------------
-;                                          ELIMINAR NODO
-; ------------------------------------------------------
-; Entradas: Arbol
-;           Nodo a eliminar
-;
-; Salida:   Nuevo arbol 
-; ------------------------------------------------------
+#| DELETE |#
 
 (define (delete-node tree id-node)
   (cond
@@ -185,14 +136,14 @@ primero llama a una funcion auxiliar, esta va a ayudar a insertar el nodo y devu
     [else 0]
   ))
 
-#| Funcion auxiliar a borrar nodo |#
+#| |#
 (define (delete-node-aux root id-node)
      (define new-childs (through-node-list2 (struct_node-childs root) id-node))
      (define aux (struct-copy struct_node root [childs new-childs]))
      (set! root aux)
       root) #| devuelve la raiz del arbol actualizada con su nuevo hijo en alguna parte|#  
 
-#| Recorre la lista con una lista de nodos y un id a buscar |#
+#| |#
 (define (through-node-list2 node-list id)
   (cond
     [(empty? node-list)
@@ -202,12 +153,11 @@ primero llama a una funcion auxiliar, esta va a ayudar a insertar el nodo y devu
        (cond
          [(empty? sub-tree) (through-node-list2 (list-tail node-list 1) id)]
          [else (append (list sub-tree)  (through-node-list2 (list-tail node-list 1) id))])]))
-
-#| Borra el nodo en cuestion cuando lo encuentra y lo convierte en una lista vacia |#
+#| |#
 (define (check-delete act-node id)
   (cond
     [(equal? (struct_node-id act-node) id) 
-             (set! act-node (list)) 
+             (set! act-node (list)) #| convierto el nodo en una lista vacia|#
              (list)]
     [else
           (define new-childs (through-node-list2 (struct_node-childs act-node) id ))
@@ -215,24 +165,15 @@ primero llama a una funcion auxiliar, esta va a ayudar a insertar el nodo y devu
           (set! act-node node-aux)
            act-node]))
 
-; ------------------------------------------------------
-;                                     BUSCAR EL ANCESTRO
-; ------------------------------------------------------
-; Entradas: Arbol
-;           ID de nodo para buscar el ancestro
-;
-; Salida:   El nodo ancestro, que se compone de:
-;               - ID
-;               - Nombre
-;               - Valor
-; ------------------------------------------------------
+#| ANCESTOR |#
+#| |#
 (define (ancestor tree id)
   (cond
     [(empty? (struct_tree-root tree)) false]
     [else (check-ancestor (struct_tree-root tree) id (struct_tree-root tree) )]))
 
 #|
-Recibe el nodo y revisa su ancestor
+Recibe el nodo 
 |#
 (define (check-ancestor node id father)
   (cond
@@ -240,7 +181,7 @@ Recibe el nodo y revisa su ancestor
     [(empty? (struct_node-childs node)) false]
     [else (check-ancestor-childs (struct_node-childs node) id node)]))
 #|
-Recorre la lista de hijos de un nodo para ver si coincide con el nodo ancestor
+Recorre la lista de hijos de un nodo
 |#
 (define (check-ancestor-childs node-list id father)
   (cond
@@ -251,13 +192,9 @@ Recorre la lista de hijos de un nodo para ver si coincide con el nodo ancestor
            [(boolean? result) (check-ancestor-childs (list-tail node-list 1) id father)]
            [else result])]))
 
-; ------------------------------------------------------
-;                                     DIBUJAR ARBOL
-; ------------------------------------------------------
-; Entradas: Arbol
-;
-; Salida:   Abol Dibujado en pantalla
-; ------------------------------------------------------
+#|
+PRINT PINGA
+|#
 #| |#
 (define (draw tree)
   (define (viz tree)
