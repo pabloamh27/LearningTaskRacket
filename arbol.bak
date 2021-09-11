@@ -20,12 +20,12 @@
 define la estructura del arbol, nada mas tiene el node root,
 el cual es un node comun y corriente por el cual se empieza todo.
 |#
-(define-struct struct_tree(root) #:transparent #:mutable) 
+(define-struct struct_tree(root))
 
 
 #|define la estructura del node, el cual tiene
 un id, un name, value y una lista de childs.|#
-(define-struct struct_node (id name value childs)#:transparent #:mutable)
+(define-struct struct_node (id name value childs))
 
 
 #| FUNCIONES |#
@@ -366,10 +366,10 @@ es completamente compatible
                [(boolean? result) result] #| si es booleano es que mando falso, entonces devuelvo falso |#
                [else (draw (get-tree result))])])) 
 
+#|
 
-
-;------------------------------------
-;TEST #2 , #3 definicions de arbol ingreso de nodos y busqueda de nodos
+------------------------------------
+TEST #2 , #3 definicions de arbol ingreso de nodos y busqueda de nodos
 (define n1 (create-node 1 "1" 1))
 
 (define tree (create-tree n1))
@@ -380,13 +380,15 @@ es completamente compatible
 (set! tree (insert-node tree 2 5 "5" 5))
 (set! tree (insert-node tree 2 6 "6" 6))
 
+
+
 (find-node tree 1)
 (find-node tree 2)
 (find-node tree 3)
 (find-node tree 4)
 (find-node tree 5)
 (find-node tree 6)
-#|
+
 TEST #3 eliminar un nodo sin hijos
 (set! tree (delete-node tree 3))
 TEST #4 eliminar un nodo con hijos

@@ -93,8 +93,7 @@
        [else (lista-mas-larga-aux (rest lista-a-buscar) temporal (first (rest lista-a-buscar))iterative-list)]))
 
 
-; (delete-ficha <objective-list> <domino>)
-; (find-lista-más-larga <lista-fichas> <lista-larga>)
+
 
 
      
